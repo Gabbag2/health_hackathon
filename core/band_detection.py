@@ -16,9 +16,10 @@ For each band we:
 
 Frequency bands (defaults, all in Hz)
 --------------------------------------
-  theta : 4–8 Hz   (rodent theta can extend to ~12 Hz; adjust via `bands`)
-  alpha : 8–13 Hz
-  beta  : 13–30 Hz
+  low   : 0.2-7 Hz
+  theta : 7-12 Hz
+  beta  : 15-30 Hz
+  High  : 30-80 Hz
 """
 
 import numpy as np
@@ -30,9 +31,10 @@ from scipy.signal import butter, filtfilt, hilbert
 # ---------------------------------------------------------------------------
 
 FREQ_BANDS = {
-    "theta": (4, 8),    # Hz
-    "alpha": (8, 13),   # Hz
-    "beta":  (13, 30),  # Hz
+    "low":   (0.2, 7),  # Hz
+    "theta": (7, 12),   # Hz
+    "beta":  (15, 30),  # Hz
+    "high":  (30, 80),  # Hz
 }
 
 
