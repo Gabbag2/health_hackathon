@@ -11,6 +11,9 @@ The dataset:
 - may **NOT** be used for research, publication, or derivative works
 - may **NOT** be retained after the event
 
+
+
+
 All rights to the dataset are reserved by the authors. 
 
 Data and example notebook can be accessed trough this page: **https://drive.google.com/drive/folders/14mSP5zmwj7ukhmhGYxlaYCjFgI8mt2Xp?usp=drive_link**
