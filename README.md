@@ -2,7 +2,7 @@
 
 ## Dataset usage restrictions
 
-The dataset provided in this repository is **UNPLUBISHED DATA** and is made
+The dataset provided in this repository is **UNPUBLISHED DATA** and is made
 available **exclusively for use within the context of HACKATHON POTENTIAL**.
 
 The dataset:
