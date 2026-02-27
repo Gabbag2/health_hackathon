@@ -98,6 +98,18 @@ def plot_band_activity(
     t_start = float(epoch_row["t_start"])
     t_end   = float(epoch_row["t_end"])
 
+    # When a zoom window is requested, crop the signal before running the
+    # (expensive) Hilbert transform so we never process more than needed.
+    # A 1-second buffer on each side avoids filter edge artefacts.
+    if xlim is not None:
+        buffer = 1.0
+        crop_lo = max(float(xlim[0]) - buffer, t_start)
+        crop_hi = min(float(xlim[1]) + buffer, t_end)
+        idx_lo  = int((crop_lo - t_start) * fs)
+        idx_hi  = int((crop_hi - t_start) * fs) + 1
+        lfp     = lfp[idx_lo:idx_hi]
+        t_start = crop_lo
+
     # Run detection
     result = detect_significant_band_epochs(
         lfp, fs,
