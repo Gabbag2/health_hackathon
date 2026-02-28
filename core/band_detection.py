@@ -35,8 +35,8 @@ FREQ_BANDS = {
     "theta": (7, 12),   # Hz
     "beta":  (15, 30),  # Hz
     "high":  (30, 80),  # Hz
-    "ripple150": (130, 160),  # Hz
-    "ripple250": (230, 270),  # Hz
+#    "ripple150": (130, 160),  # Hz
+#    "ripple250": (230, 270),  # Hz
 }
 
 
