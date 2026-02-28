@@ -2,6 +2,9 @@ from .band_detection import (
     FREQ_BANDS,
     compute_band_envelope,
     detect_significant_band_epochs,
+    apply_notch_filter,
+    compute_broadband_power,
+    compute_relative_band_power,
 )
 from .plot_bands import (
     BAND_COLORS,
@@ -13,6 +16,11 @@ from .preprocessing import (
     load_raw,
     mark_amplitude_artifacts,
 )
+from .stats import (
+    weighted_permutation_test,
+    sig_label,
+    eta_sq_label,
+)
 
 __all__ = [
     # Bandes de fréquence
@@ -23,9 +31,17 @@ __all__ = [
     # Détection de bandes
     "compute_band_envelope",
     "detect_significant_band_epochs",
+    # Filtrage et puissance
+    "apply_notch_filter",
+    "compute_broadband_power",
+    "compute_relative_band_power",
     # Prétraitement
     "AMPLITUDE_THRESHOLD_UV",
     "preprocess",
     "load_raw",
     "mark_amplitude_artifacts",
+    # Statistiques
+    "weighted_permutation_test",
+    "sig_label",
+    "eta_sq_label",
 ]

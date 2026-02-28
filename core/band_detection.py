@@ -23,7 +23,7 @@ Frequency bands (defaults, all in Hz)
 """
 
 import numpy as np
-from scipy.signal import butter, filtfilt, hilbert
+from scipy.signal import butter, filtfilt, hilbert, iirnotch, welch
 
 
 # ---------------------------------------------------------------------------
@@ -153,3 +153,129 @@ def detect_significant_band_epochs(
         "significant": significant,
         "thresholds":  thresholds,
     }
+
+
+# ---------------------------------------------------------------------------
+# Filtre notch (coupe-bande)
+# ---------------------------------------------------------------------------
+
+def apply_notch_filter(lfp, fs, notch_freq=50.0, Q=30):
+    """
+    Applique un filtre coupe-bande (notch) à notch_freq Hz.
+
+    Utilise scipy.signal.iirnotch + filtfilt (zero-phase).
+    Le facteur de qualité Q contrôle la largeur de bande :
+    bande_3dB = notch_freq / Q  (≈ 1.67 Hz à Q=30, f=50 Hz).
+
+    Paramètres
+    ----------
+    lfp : np.ndarray, shape (n_samples,)
+        Signal LFP brut (µV), typiquement à 1250 Hz.
+    fs : float
+        Fréquence d'échantillonnage (Hz).
+    notch_freq : float
+        Fréquence cible du notch (Hz). Défaut : 50 Hz (bruit secteur).
+    Q : float
+        Facteur de qualité. Défaut : 30.
+
+    Retourne
+    --------
+    lfp_filt : np.ndarray, shape (n_samples,)
+        Signal après suppression de la composante à notch_freq Hz.
+    """
+    lfp = np.asarray(lfp, dtype=float)
+    b, a = iirnotch(notch_freq, Q, fs)
+    # filtfilt requiert len(x) > padlen = 3 * max(len(a), len(b))
+    padlen = 3 * max(len(a), len(b))
+    if len(lfp) <= padlen:
+        return lfp.copy()
+    return filtfilt(b, a, lfp)
+
+
+# ---------------------------------------------------------------------------
+# Puissance broadband (Welch)
+# ---------------------------------------------------------------------------
+
+def compute_broadband_power(lfp, fs, f_low=0.5, f_high=50.0, nperseg=None):
+    """
+    Calcule la puissance totale PSD Welch dans la bande [f_low, f_high].
+
+    La puissance est exprimée en µV² (somme des densités spectrales × Δf).
+
+    Paramètres
+    ----------
+    lfp : np.ndarray
+        Signal LFP (typiquement après filtre notch 50 Hz).
+    fs : float
+        Fréquence d'échantillonnage (Hz).
+    f_low : float
+        Borne basse de la bande broadband (Hz). Défaut : 0.5 Hz.
+    f_high : float
+        Borne haute (Hz). Défaut : 50 Hz.
+    nperseg : int or None
+        Longueur du segment Welch. Si None, utilise min(4*fs, n_samples).
+        Clampé à n_samples pour éviter les UserWarnings scipy.
+
+    Retourne
+    --------
+    power : float
+        Puissance broadband en µV². np.nan si le signal est trop court
+        ou si la puissance calculée n'est pas finie.
+    """
+    lfp = np.asarray(lfp, dtype=float)
+    n = len(lfp)
+    if n < 2:
+        return np.nan
+    _nperseg = min(nperseg if nperseg is not None else int(4 * fs), n)
+    _noverlap = min(_nperseg // 2, _nperseg - 1)
+    freqs, psd = welch(lfp, fs=fs, nperseg=_nperseg, noverlap=_noverlap)
+    total = psd[(freqs >= f_low) & (freqs <= f_high)].sum()
+    return float(total) if np.isfinite(total) else np.nan
+
+
+# ---------------------------------------------------------------------------
+# Puissance relative par bande (Welch)
+# ---------------------------------------------------------------------------
+
+def compute_relative_band_power(
+    lfp, fs, f_low, f_high,
+    f_total_low=0.5, f_total_high=50.0,
+    nperseg=None,
+):
+    """
+    Calcule la puissance relative d'une bande via la méthode de Welch.
+
+    Puissance relative = Σ PSD(f∈[f_low, f_high]) / Σ PSD(f∈[f_total_low, f_total_high])
+
+    Paramètres
+    ----------
+    lfp : np.ndarray
+        Signal LFP (typiquement après filtre notch 50 Hz).
+    fs : float
+        Fréquence d'échantillonnage (Hz).
+    f_low, f_high : float
+        Bornes de la bande d'intérêt (Hz).
+    f_total_low, f_total_high : float
+        Bornes pour le calcul de la puissance totale de référence.
+        Défaut : 0.5–50 Hz (cohérent avec le filtre notch appliqué).
+    nperseg : int or None
+        Longueur du segment Welch. Si None, utilise min(4*fs, n_samples).
+
+    Retourne
+    --------
+    rel_power : float
+        Puissance relative (adimensionnelle, entre 0 et 1).
+        np.nan si le signal est trop court ou la puissance totale est nulle.
+    """
+    lfp = np.asarray(lfp, dtype=float)
+    n = len(lfp)
+    if n < 2:
+        return np.nan
+    _nperseg = min(nperseg if nperseg is not None else int(4 * fs), n)
+    _noverlap = min(_nperseg // 2, _nperseg - 1)
+    freqs, psd = welch(lfp, fs=fs, nperseg=_nperseg, noverlap=_noverlap)
+    total = psd[(freqs >= f_total_low) & (freqs <= f_total_high)].sum()
+    if total == 0 or not np.isfinite(total):
+        return np.nan
+    band_power = psd[(freqs >= f_low) & (freqs <= f_high)].sum()
+    return float(band_power / total)

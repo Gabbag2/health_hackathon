@@ -1,0 +1,7 @@
+sleep_type,region_pair,delta_av1,delta_av2,delta_rw1,delta_rw2,delta_aversive_pooled,p_aversive_pool,sig_av_pool,delta_rewarded_pooled,p_rewarded_pool,sig_rw_pool,interaction_obs,p_interaction,sig_interaction,p_rw_gt_av,ci_overlap_av,ci_overlap_rw
+NREM,vHPC ↔ dHPC,0.041411,0.031817,-0.002109,0.028735,0.033744,0.0018,**,0.027834,0.1332,ns,0.00591,0.7834,ns,0.6054,oui,oui
+NREM,BLA ↔ dHPC,0.048646,0.05249,0.006578,0.031075,0.045083,0.0004,***,0.033399,0.1224,ns,0.011684,0.645,ns,0.6761,oui,oui
+NREM,BLA ↔ vHPC,0.045556,0.024629,-0.011605,0.035667,0.033894,0.0037,**,0.030549,0.1615,ns,0.003346,0.8914,ns,0.5535,oui,oui
+REM,vHPC ↔ dHPC,0.037768,0.021778,-0.021622,0.042289,0.030122,0.0123,*,0.024571,0.2684,ns,0.005551,0.8224,ns,0.593,oui,oui
+REM,BLA ↔ dHPC,0.047377,0.025606,-0.028473,0.04769,0.037824,0.0067,**,0.026566,0.2958,ns,0.011258,0.6971,ns,0.6541,oui,oui
+REM,BLA ↔ vHPC,0.039884,0.012854,-0.028068,0.038528,0.028204,0.0285,*,0.020122,0.3746,ns,0.008082,0.7516,ns,0.6305,oui,oui
